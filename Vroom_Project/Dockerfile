@@ -15,7 +15,7 @@ COPY ./Vroom_Project/Vroom_Project.csproj ./Vroom_Project/
 WORKDIR /src/Vroom_Project
 
 # Restore dependencies
-RUN dotnet restore "./Vroom_Project.csproj" --disable-parallel
+RUN dotnet restore "./Vroom_Project/Vroom_Project.csproj" --disable-parallel --configfile ./nuget.config
 
 # Copy the rest of the application code
 COPY . ./
