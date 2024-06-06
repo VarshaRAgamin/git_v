@@ -1,0 +1,123 @@
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+/* General body styling for consistent font and margin */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Styling for the header section */
+.header, .footer {
+    background-color: #003366; /* Dark blue background */
+    color: white; /* White text color */
+    text-align: center; /* Center align text */
+    padding: 20px 0; /* Top and bottom padding */
+}
+
+/* Container for header content to ensure proper spacing and alignment */
+.header-content {
+    max-width: 1200px; /* Max width for the content */
+    margin: 0 auto; /* Center the header content */
+    padding: 0 20px; /* Side padding */
+    display: flex; /* Flexbox for layout */
+    justify-content: space-between; /* Space between items */
+    align-items: center; /* Center items vertically */
+}
+
+    /* Header title styling */
+    .header-content h1 {
+        margin: 0; /* Remove default margin */
+        font-size: 24px; /* Font size */
+    }
+
+    /* Navigation styling within header */
+    .header-content nav ul {
+        list-style-type: none; /* Remove list bullets */
+        padding: 0; /* Remove padding */
+        margin: 0; /* Remove margin */
+        display: flex; /* Flexbox for horizontal layout */
+        gap: 20px; /* Space between items */
+    }
+
+        /* Individual navigation link styling */
+        .header-content nav ul li {
+            margin: 0; /* Remove default margin */
+        }
+
+            .header-content nav ul li a {
+                text-decoration: none !important;
+                color: white !important;
+                font-weight: bold !important;
+            }
+
+                .header-content nav ul li a:hover {
+                    text-decoration: underline; /* Underline on hover */
+                }
+
+/* Media query for responsiveness */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column; /* Stack items vertically on smaller screens */
+        text-align: center; /* Center text on smaller screens */
+    }
+
+        .header-content nav ul {
+            flex-direction: column; /* Stack nav links vertically */
+            gap: 10px; /* Adjust gap for vertical layout */
+        }
+}
+
+.container {
+    display: flex;
+    flex: 1;
+}
+
+.sidebar {
+    width: 200px;
+    background-color: #f4f4f4;
+    padding: 15px;
+}
+
+.main-content {
+    flex: 1;
+    padding: 20px;
+}
+
+.sidebar-content ul, .header-content nav ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+    .sidebar-content ul li, .header-content nav ul li {
+        margin: 10px 0;
+    }
+
+        .sidebar-content ul li a, .header-content nav ul li a {
+            text-decoration: none;
+            color: #003366;
+        }
+
+            .sidebar-content ul li a:hover, .header-content nav ul li a:hover {
+                text-decoration: underline;
+            }
+
+.footer-content p {
+    margin: 0;
+}

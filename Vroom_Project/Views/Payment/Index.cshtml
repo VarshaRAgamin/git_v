@@ -1,0 +1,147 @@
+﻿@model IEnumerable<Vroom_Project.ViewModels.PaymentModel>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutBank.cshtml";
+}
+
+<h1>Payments</h1>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FullName)
+            </th>
+            
+            <th>
+                @Html.DisplayNameFor(model => model.InitialAmount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ApprovedAmount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AccountId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AccountNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AccountType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaidBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaidDate)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FullName)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.InitialAmount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ApprovedAmount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AccountId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AccountNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AccountType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PaidBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PaidDate)
+            </td>
+            <td>
+                    <a asp-action="ListOfPayments" asp-route-id="@item.Id" class="btn btn-primary">Payment</a>
+                    <a class="btn btn-success" onclick="showPaymentDetails(@item.Id)">PaymentDetails</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<!-- Modal -->
+<div class="modal" id="paymentDetailsModal" tabindex="-1" role="dialog" aria-labelledby="paymentDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentDetailsModalLabel">Payment Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="paymentDetailsContent">
+                <table id="paymentDetailsTable" class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>ApprovedAmount</th>
+                            <th>Paid Date</th>
+                            <th>Paid By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Payment details rows will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    // Use jQuery noConflict mode
+    // Define the showPaymentDetails function
+    var $jq = jQuery.noConflict();
+
+    function showPaymentDetails(accountId) {
+        
+        console.log("Account ID:", accountId);
+        $jq.ajax({
+            url: '/Payment/PaymentDetailById?id=' + accountId,
+            type: 'GET',
+            success: function (data) {
+                console.log(data);
+                var payment = data;
+                var date = new Date(payment.paidDate);
+                var options = { day: '2-digit', month: 'long', year: 'numeric' };
+                var formattedDate = date.toLocaleDateString('en-GB', options);
+                var tableRow = `
+                            <tr>
+                                <td>${payment.accountId}</td>
+                                <td>${payment.approvedAmount}</td>
+                                <td>${formattedDate}</td>
+                                <td>${payment.paidBy}</td>
+                            </tr>
+                        `;
+                $jq('#paymentDetailsTable tbody').html(tableRow);
+
+                $jq('#paymentDetailsModal').modal('show');
+            },
+            error: function (xhr, status, error) {
+                console.error('Failed to load payment details:', error);
+            }
+        });
+    }
+</script>
+

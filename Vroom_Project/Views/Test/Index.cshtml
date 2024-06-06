@@ -1,0 +1,20 @@
+﻿<!-- Views/Names/Index.cshtml -->
+@model Vroom_Project.ViewModels.MakeModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add make</title>
+</head>
+<body>
+    <h1>Names List</h1>
+    @if (TempData["Message"] != null)
+    {
+        <div style="color: green;">@TempData["Message"]</div>
+    }
+    <form asp-action="Add" method="post">
+        <input type="text" asp-for="Name" name="name"  placeholder="Enter a name" />
+        <button type="submit">Add Name</button>
+    </form>
+</body>
+</html>

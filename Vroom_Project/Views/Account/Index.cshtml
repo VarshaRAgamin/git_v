@@ -1,0 +1,258 @@
+﻿@model IEnumerable<Vroom_Project.ViewModels.ListViewAccounts>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutBank.cshtml";
+}
+<link href="~/js/modal.css" rel="stylesheet" />
+
+<h1>Bank Account Opening</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Open Account</a>
+</p>
+<table class="table table-responsive" id="dataTable">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FullName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AccountNumber)
+            </th>
+            <th>Image</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr data-id="@item.Id">
+            <td>
+                @Html.DisplayFor(modelItem => item.FullName)
+            </td>
+           
+            <td>
+                @Html.DisplayFor(modelItem => item.Amount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AccountNumber)
+            </td>
+                <td>
+                    <img src="data:image/png;base64,@item.ImageBase64" alt="User Image"style="width:1in; height:1in;" />
+                </td>
+       
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-success">Edit</a> 
+                <a asp-action="DeleteAccount" asp-route-id="@item.Id"class="btn btn-danger">Delete</a>
+                    <a data-id="@item.Id" id="renewalBtn" class="btn btn-success">Renewal</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<div id="demandModal" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+        @await Html.PartialAsync("_ToastrNotifications")
+        <span class="close">&times;</span>
+        <h2>Account Details</h2>
+        <p>Name: <span id="FirstName"></span></p>
+        <p>Maturity Date: <span id="MaturityDate"></span></p>
+        <p>Do you want to proceed with demand?</p>
+        <button id="yesBtn">Yes</button>
+        <input type="hidden" id="Id" />
+        <button id="noBtn">No</button>
+    </div>
+</div>
+<div id="renewalModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Demand Renewal</h2>
+        <input type="hidden" id="renId" />
+        <p>Account No: <span id="AccountNo"></span></p>
+        <p>Name: <span id="FirstNameRen"></span></p>
+        <p>Amount: <input type="number" id="Amount" /></p>
+        <button id="renewalSubmitBtn">Submit Renewal</button>
+    </div>
+</div>
+<script>
+    // Use jQuery.noConflict() to release the $ alias
+    jQuery.noConflict();
+
+    // Use jQuery(document).ready() instead of $(document).ready()
+    jQuery(document).ready(function ($) {
+        // Attach click event handler to table rows
+        $('#dataTable tbody').on('click', 'tr', function (event) {
+            var rowId = $(this).data('id'); // Get the ID of the clicked row
+            var target = $(event.target); // Get the clicked element
+
+            // Check if the clicked element is not the delete or renewal button
+            if (!target.is('.btn-danger') && !target.is('.btn-success')) {
+                // AJAX call to fetch data dynamically
+                $.ajax({
+                    url: '/Account/GetAccountById?id=' + rowId, // URL to your server-side script
+                    method: 'GET',
+                    data: { id: rowId }, // Pass the row ID to the server
+                    success: function (response) {
+                        // Parse response data
+                        var data = response;
+                        var firstName = data.fullName; // Extract first name from response
+                        var maturityDate = data.maturityDate; // Extract maturity date from response
+                        var id = data.id;
+                        openModal(firstName, maturityDate, id, data.accountNo);
+                    },
+                    error: function () {
+                        console.error("Error fetching data.");
+                    }
+                });
+            }
+        });
+
+        $('#yesBtn').click(function () {
+            // Get the ID value
+            var userId = $('#Id').val();
+
+            // Debugging: Log the ID to ensure it is being retrieved correctly
+            console.log('User ID:', userId);
+
+            if (userId) {
+                $.ajax({
+                    url: '/Account/DemandRequest?id=' + userId, // URL of the demandrequest endpoint
+                    method: 'PUT',
+                    data: { id: userId }, // Pass the ID as a query parameter
+                    success: function (data) {
+                        console.log('Success:', data);
+                        closeModal();
+                        toastr.success("Account demanded successfully", "Success");
+                        // Redirect to another page or show success message
+                        // window.location.href = '/Account/DemandRequest?id=' + userId; // Redirect to the demandrequest page
+
+                    },
+                    error: function (xhr, status, error) {
+                        closeModal();
+                        toastr.error(xhr.responseJSON.message, "Error");
+
+                    }
+                });
+            } else {
+                console.error('Error: User ID is not defined.');
+                alert('Error: User ID is not defined.');
+            }
+        });
+
+        // Attach click event handler to the noBtn
+        $('#noBtn').click(function () {
+            closeModal();
+        });
+        $(document).on('click', '#renewalBtn', function () {
+            var rowId = $(this).data('id');
+            $.ajax({
+                url: '/Account/GetAccountById?id=' + rowId, // URL to your server-side script
+                method: 'GET',
+                data: { id: rowId }, // Pass the row ID to the server
+                success: function (response) {
+                    // Parse response data
+                    var data = response;
+                    var firstName = data.fullName; // Extract first name from response
+                    var acno = data.accountNumber; // Extract maturity date from response
+                    var id = data.id;
+                    openModalRen(firstName, acno, id);
+                },
+                error: function () {
+                    console.error("Error fetching data.");
+                }
+            });
+        })
+        $('.close').click(function () {
+            closeModal();
+        });
+        $(window).click(function (event) {
+            if (event.target == $('#demandModal')[0]) {
+                $('#demandModal').hide();
+            } else if (event.target == $('#renewalModal')[0]) {
+                $('#renewalModal').hide();
+            }
+        });
+
+        // Function to close the modal
+        function closeModal() {
+            $('#demandModal').hide();
+            $('#renewalModal').hide();
+        }
+
+        // Function to open the modal for account demand
+        function openModal(firstName, maturityDate, id, accountNo) {
+            // Get modal element
+            var modal = document.getElementById("demandModal");
+
+            // Check if modal exists
+            if (modal) {
+                document.getElementById("FirstName").textContent = firstName;
+                document.getElementById("MaturityDate").textContent = maturityDate;
+                $('#Id').val(id);
+                $('#AccountNo').val(accountNo); // Set accountNo value
+                $('#Name').val(firstName); // Set name value
+                modal.style.display = "block";
+            } else {
+                console.error("Modal element not found.");
+            }
+        }
+        // Function to open the renewal modal
+        function openModalRen(firstName, acno, id) {
+            var modal = document.getElementById("renewalModal");
+            if (modal) {
+                document.getElementById("FirstNameRen").textContent = firstName;
+                document.getElementById("AccountNo").textContent = acno;
+                $('#renId').val(id);
+
+                modal.style.display = "block";
+            } else {
+                console.error("Renewal modal element not found.");
+            }
+        }
+        $(document).on('click', '#renewalSubmitBtn', function () {
+            var id = $('#renId').val();
+            var amount = $('#Amount').val();
+            if (id && amount) {
+                $.ajax({
+                    url: '/Account/DepositRenewal',
+                    method: 'POST',
+                    data: { id: id, amount: amount },
+                    success: function (data) {
+                        console.log('Success:', data);
+                        closeModal();
+                        toastr.success("Renewal submitted successfully", "Success");
+                    },
+                    error: function (xhr, status, error) {
+                        var errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : "An error occurred";
+                        console.error("Error:", errorMessage);
+                        closeModal();
+                        toastr.error(errorMessage, "Error");
+                    }
+                });
+            } else {
+                console.error("Invalid data for renewal submission.");
+            }
+        });
+
+        $('.close').click(function () {
+            closeModal();
+        });
+        $(window).click(function (event) {
+            if (event.target == $('#renewalModal')[0]) {
+                $('#renewalModal').hide();
+            }
+        });
+
+        // Function to close the modal
+        function closeModal() {
+            $('#demandModal').hide();
+            $('#renewalModal').hide();
+        }
+    });
+</script>
+
+
