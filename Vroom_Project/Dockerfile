@@ -9,7 +9,7 @@ COPY NuGet.config ./
 
 # Copy the csproj file and restore dependencies
 COPY ["Vroom_Project/Vroom_Project.csproj", "Vroom_Project/"]
-RUN dotnet restore "./Vroom_Project/Vroom_Project.csproj" --disable-parallel --configfile ./NuGet.config
+RUN dotnet restore "./Vroom_Project/Vroom_Project.csproj"
 
 # Copy the entire project and build
 COPY . .
