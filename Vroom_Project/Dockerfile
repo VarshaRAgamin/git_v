@@ -1,32 +1,41 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+# Use the official .NET SDK image
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
 
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
-WORKDIR /app
-EXPOSE 80
-EXPOSE 443
-
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-ARG BUILD_CONFIGURATION=Release
+# Set working directory
 WORKDIR /src
-COPY ["Vroom_Project/Vroom_Project.csproj", "Vroom_Project/"]
+
+# Copy NuGet configuration file
+COPY ./NuGet.config ./
+
 # Clear NuGet cache
 RUN dotnet nuget locals all --clear
 
-# Restore as distinct layers for faster rebuilds
+# Copy and restore dependencies
 COPY ./Vroom_Project/Vroom_Project.csproj ./Vroom_Project/
 WORKDIR /src/Vroom_Project
 
 # Disable parallel restores to avoid timeout issues
 RUN dotnet restore "./Vroom_Project.csproj" --disable-parallel
-COPY . .
-WORKDIR "/src/Vroom_Project"
-RUN dotnet build "./Vroom_Project.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Vroom_Project.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+# Copy the rest of the application code
+COPY . ./
 
-FROM base AS final
+# Build the project
+RUN dotnet build "Vroom_Project.csproj" -c Release -o /app/build
+
+# Publish the project
+RUN dotnet publish "Vroom_Project.csproj" -c Release -o /app/publish
+
+# Use the official .NET runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:6.0
+
 WORKDIR /app
-COPY --from=publish /app/publish .
+
+# Copy the published files from the build image
+COPY --from=build-env /app/publish .
+
+# Expose the application port
+EXPOSE 80
+
+# Run the application
 ENTRYPOINT ["dotnet", "Vroom_Project.dll"]
