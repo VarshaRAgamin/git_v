@@ -9,6 +9,8 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Vroom_Project/Vroom_Project.csproj", "Vroom_Project/"]
+# Clear NuGet cache
+RUN dotnet nuget locals all --clear
 RUN dotnet restore "./Vroom_Project/Vroom_Project.csproj" --disable-parallel
 COPY . .
 WORKDIR "/src/Vroom_Project"
