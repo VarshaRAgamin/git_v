@@ -5,11 +5,11 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 
 # Copy nuget.config file to the container
-COPY nuget.config ./
+COPY NuGet.config ./
 
 # Copy the csproj file and restore dependencies
 COPY ["Vroom_Project/Vroom_Project.csproj", "Vroom_Project/"]
-RUN dotnet restore "./Vroom_Project/Vroom_Project.csproj" --disable-parallel --configfile ./nuget.config
+RUN dotnet restore "./Vroom_Project/Vroom_Project.csproj" --disable-parallel --configfile ./NuGet.config
 
 # Copy the entire project and build
 COPY . .
