@@ -11,7 +11,13 @@ WORKDIR /src
 COPY ["Vroom_Project/Vroom_Project.csproj", "Vroom_Project/"]
 # Clear NuGet cache
 RUN dotnet nuget locals all --clear
-RUN dotnet restore "./Vroom_Project/Vroom_Project.csproj" --disable-parallel
+
+# Restore as distinct layers for faster rebuilds
+COPY ./Vroom_Project/Vroom_Project.csproj ./Vroom_Project/
+WORKDIR /src/Vroom_Project
+
+# Disable parallel restores to avoid timeout issues
+RUN dotnet restore "./Vroom_Project.csproj" --disable-parallel
 COPY . .
 WORKDIR "/src/Vroom_Project"
 RUN dotnet build "./Vroom_Project.csproj" -c $BUILD_CONFIGURATION -o /app/build
