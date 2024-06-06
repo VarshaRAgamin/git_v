@@ -1,41 +1,35 @@
-# Use the official .NET SDK image
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
+# Stage 1: Build
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 
-# Set working directory
+# Set the working directory
 WORKDIR /src
 
-# Copy NuGet configuration file
-COPY NuGet.config ./
+# Copy nuget.config file to the container
+COPY nuget.config ./
 
-# Clear NuGet cache
-RUN dotnet nuget locals all --clear
+# Copy the csproj file and restore dependencies
+COPY ["Vroom_Project/Vroom_Project.csproj", "Vroom_Project/"]
+RUN dotnet restore "./Vroom_Project/Vroom_Project.csproj" --disable-parallel --configfile ./nuget.config
 
-# Copy the project file and restore as distinct layers
-COPY ./Vroom_Project/Vroom_Project.csproj ./Vroom_Project/
-WORKDIR /src/Vroom_Project
-
-# Restore dependencies
-RUN dotnet restore "./Vroom_Project/Vroom_Project.csproj" --disable-parallel --configfile ./NuGet.config
-
-# Copy the rest of the application code
-COPY . ./
-
-# Build the project
+# Copy the entire project and build
+COPY . .
+WORKDIR "/src/Vroom_Project"
 RUN dotnet build "Vroom_Project.csproj" -c Release -o /app/build
 
 # Publish the project
 RUN dotnet publish "Vroom_Project.csproj" -c Release -o /app/publish
 
-# Use the official ASP.NET runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:6.0
+# Stage 2: Serve
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 
+# Set the working directory
 WORKDIR /app
 
-# Copy the published files from the build image
-COPY --from=build-env /app/publish .
+# Copy the published output from the build stage
+COPY --from=build /app/publish .
 
-# Expose the application port
+# Expose the port the app runs on
 EXPOSE 80
 
-# Run the application
+# Start the app
 ENTRYPOINT ["dotnet", "Vroom_Project.dll"]
