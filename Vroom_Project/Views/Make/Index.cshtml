@@ -1,0 +1,29 @@
+﻿@model IEnumerable<Vroom_Project.ViewModels.CreateModel>
+<br /><br />
+<div class ="row">
+    <div class="col-12">
+        <h2 class ="text-info">Makes of vehicle </h2>
+    </div>
+    <div class="col-6 text-right">
+        <a class="btn btn-info" asp-action="Create"> Add new make</a>
+    </div>
+    <br />
+  <div>
+        <table class="table table-striped border">
+            <tr class="table-info">
+                <th>
+                    @Html.DisplayNameFor(m => m.Name)
+                </th>
+            </tr>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(m => item.Name)
+                    </td>
+                    <td class="text-right"> Edit | Delete</td>
+                </tr>
+            }
+        </table>
+  </div>
+</div>

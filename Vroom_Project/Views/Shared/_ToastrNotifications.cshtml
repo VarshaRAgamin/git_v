@@ -1,0 +1,17 @@
+﻿@using Vroom_Project.Views.Test
+@* Views/Shared/_ToastrNotifications.cshtml *@
+@{
+    var toastrMessages = TempData.Get<List<ToastrMessage>>("ToastrMessages");
+}
+
+@if (toastrMessages != null)
+{
+    <script type="text/javascript">
+        @foreach (var message in toastrMessages)
+        {
+            <text>
+                toastr["@message.Type"]("@message.Message", "@message.Title");
+            </text>
+        }
+    </script>
+}

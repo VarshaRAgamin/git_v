@@ -1,0 +1,131 @@
+﻿@model IEnumerable<Vroom_Project.ViewModels.CommissionModel>
+@{
+    Layout = "~/Views/Shared/_LayoutBank.cshtml";
+}
+<p>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.CommissionDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Acno)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FullName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CommissionDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Acno)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Amount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FullName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+                <td>
+                    @if (item.Status != "Paid")
+                    {
+                        <a asp-action="WithdrawCommission" asp-route-id="@item.Id" class="btn btn-primary">Withdraw</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-success" onclick="showPaymentDetails(@item.Id)">ViewDetails</a>
+                    }
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal" id="paymentDetailsModal" tabindex="-1" role="dialog" aria-labelledby="paymentDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentDetailsModalLabel">Payment Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="paymentDetailsContent">
+                <table id="paymentDetailsTable" class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Amount</th>
+                            <th>Paid Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Payment details rows will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    // Use jQuery noConflict mode
+    // Define the showPaymentDetails function
+    var $jq = jQuery.noConflict();
+
+    function showPaymentDetails(id) {
+        $jq.ajax({
+            url: '/Commission/ViewDetails?id=' + id,
+            type: 'GET',
+            success: function (data) {
+                console.log(data);
+                var payment = data; 
+                var date = new Date(payment.paidDate);
+                var options = { day: '2-digit', month: 'long', year: 'numeric' };
+                var formattedDate = date.toLocaleDateString('en-GB', options);
+                var tableRow = `
+                        <tr>
+                            <td>${payment.id}</td>
+                            <td>${payment.amount}</td>
+                            <td>${formattedDate}</td>
+                        </tr>
+                    `;
+                $jq('#paymentDetailsTable tbody').html(tableRow);
+
+                $jq('#paymentDetailsModal').modal('show');
+            },
+            error: function (xhr, status, error) {
+                console.error('Failed to load payment details:', error);
+            }
+        });
+    }
+</script>
+
+
+

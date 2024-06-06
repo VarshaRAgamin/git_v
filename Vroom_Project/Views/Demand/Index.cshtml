@@ -1,0 +1,75 @@
+﻿@model IEnumerable<Vroom_Project.ViewModels.ApprovedViewModel>
+
+
+   @{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutBank.cshtml";
+}
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FullName)
+            </th>
+           
+            <th>
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th>
+                    @Html.DisplayNameFor(model => model.Acno)
+            </th>
+            <th>
+                    @Html.DisplayNameFor(model => model.AprvAmt)
+            </th>
+            <th>
+                    @Html.DisplayNameFor(model => model.AcType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OpenDate)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FullName)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.Amount)
+            </td>
+            <td>
+                        @Html.DisplayFor(modelItem => item.Acno)
+            </td>
+            <td>
+                        @Html.DisplayFor(modelItem => item.AprvAmt)
+            </td>
+            <td>
+                        @Html.DisplayFor(modelItem => item.AcType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OpenDate)
+            </td>
+            <td>
+                <a asp-action="AcceptDemand" asp-route-id="@item.Id" class="btn btn-primary">AcceptDemand</a> 
+                <a asp-action="MakePayment" asp-route-id="@item.Id" class="btn btn-success">Payment</a> 
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+</body>
+</html>
