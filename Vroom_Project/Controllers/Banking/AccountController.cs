@@ -32,10 +32,7 @@ namespace Vroom_Project.Controllers.Banking
         [HttpGet]
         public IActionResult GetAll()
         {
-            // Path to the default image
-            string defaultImagePath = Path.Combine(Directory.GetCurrentDirectory(), "C:\\Users\\AIBD1006\\Downloads\\catimage.jpg");
-            byte[] defaultImageBytes = System.IO.File.ReadAllBytes(defaultImagePath);
-            string defaultImageName = "default.jpg";
+           
 
             var result = _context.UsersAccount.ToList().Select(x => new ListViewAccounts
             {
@@ -44,9 +41,8 @@ namespace Vroom_Project.Controllers.Banking
                 AccountNumber = x.AccountNumber,
                 Id = x.Id,
                 CreateDate=x.CreatedDate,
-                ImageBase64 = x.Image != null
-            ? Convert.ToBase64String(x.Image)
-            : Convert.ToBase64String(defaultImageBytes)
+                     ImageBase64 = x.Image != null
+? Convert.ToBase64String(x.Image):null
             }).OrderByDescending(x=>x.CreateDate);
 
             TempData["accounts"] = result;
