@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'jenkins-test-branch-docker', url: 'https://indrasan2012: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@github.com/indrasan2012/JenkinsTest.git'
+                git branch: 'varsha/new-bank-demo', url: 'https://varshaRAgamin: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@github.com/VarshaRAgamin/git_v.git'
             }
         }
         stage('Build and Deploy') {
