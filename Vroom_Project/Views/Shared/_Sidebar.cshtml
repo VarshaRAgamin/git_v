@@ -6,7 +6,22 @@
         <li><a href=@Url.Action("Index","Payment")>Payment</a></li>
         <li><a href=@Url.Action("Index","Demand")>DemandRequests</a></li> 
         <li><a href=@Url.Action("Index","Renewal")>ListOfRenewals</a></li>
-        <li><a href=@Url.Action("Index","Renewal")>My new Change</a></li>
         <li><a href="/Settings">Reports</a></li>
+        <li><a href="#" id="changeBtn" class="btn btn-primary">My new Change</a></li>
     </ul>
 </div>
+<script src="~/js/site.js"></script>
+    <script>
+        // Get the element with id "changeBtn"
+        var changeBtn = document.getElementById('changeBtn');
+
+        // Add a click event listener to the element
+        changeBtn.addEventListener('click', function (event) {
+            // Prevent the default action of the link (i.e., navigating to "#")
+            event.preventDefault();
+
+            // Display an alert when the link is clicked
+            alert('You clicked on "My new Change"');
+        });
+    </script>
+
