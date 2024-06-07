@@ -23,16 +23,11 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-// Define rewrite options
-var rewriteOptions = new RewriteOptions()
-    .AddRewrite(@"^bankmvc/(.*)", "$1", skipRemainingRules: true);
-
-app.UseRewriter(rewriteOptions);
 
 app.UseHttpsRedirection();
 
 app.UsePathBase(
-"/bankmvc/"
+"/bankmvc"
 );
 app.UseRouting();
 app.UseStaticFiles();
