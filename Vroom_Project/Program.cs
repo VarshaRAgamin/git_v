@@ -26,7 +26,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
+app.UsePathBase(
+"/bankmvc"
+);
 app.UseRouting();
 
 app.UseAuthorization();
