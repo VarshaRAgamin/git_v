@@ -32,7 +32,7 @@ app.UseRewriter(rewriteOptions);
 app.UseHttpsRedirection();
 
 app.UsePathBase(
-"/bankmvc"
+"/bankmvc/"
 );
 app.UseRouting();
 app.UseStaticFiles();
