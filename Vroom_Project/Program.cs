@@ -1,8 +1,8 @@
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Vroom_Project.AppDbContext;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseUrls("http://0.0.0.0:80");
 // Add services to the container.
 builder.Services.AddDbContext<VroomDbContext>(options =>
 options.UseNpgsql(builder.Configuration.GetConnectionString(("Default"))));
@@ -24,16 +24,18 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 // Define rewrite options
-        var rewriteOptions = new RewriteOptions()
-            .AddRewrite(@"^bankmvc/(.*)", "$1", skipRemainingRules: true);
+var rewriteOptions = new RewriteOptions()
+    .AddRewrite(@"^bankmvc/(.*)", "$1", skipRemainingRules: true);
 
-        app.UseRewriter(rewriteOptions);
+app.UseRewriter(rewriteOptions);
+
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+
 app.UsePathBase(
 "/bankmvc"
 );
 app.UseRouting();
+app.UseStaticFiles();
 
 app.UseAuthorization();
 app.UseEndpoints(endpoints =>
